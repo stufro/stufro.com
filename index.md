@@ -1,6 +1,8 @@
 ---
-title: Welcome to my blog
+title: stufro
+layout: home
+logo: "/assets/logo.svg"
 ---
 
 # stufro | software developer
-My name is Stuart, I like software.
+My name is Stuart, I like writing software.

@@ -1,2 +1,4 @@
-theme: minima
+theme: jekyll-theme-clean-blog
 title: stufro
+description: Software developer
+url: "https://www.stufro.com"
