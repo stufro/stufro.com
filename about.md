@@ -1,6 +1,7 @@
 ---
 title: about
 layout: page
+background: /assets/about-background.jpg
 ---
 
 # About Me

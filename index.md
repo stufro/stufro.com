@@ -1,7 +1,7 @@
 ---
 title: Stuart Frost
 layout: home
-logo: "/assets/logo.svg"
+background: /assets/ruby-gem-dark-bg.jpg
 ---
 
 # Posts
