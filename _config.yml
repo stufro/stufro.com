@@ -1,4 +1,5 @@
 theme: jekyll-theme-clean-blog
+remote-theme: StartBootstrap/startbootstrap-clean-blog-jekyll
 title: stufro
 description: My name's Stuart Frost and I'm a software developer. Here you'll mainly find my writing about Ruby on Rails and general web development.
 url: "https://www.stufro.com"
