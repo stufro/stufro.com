@@ -1,7 +1,9 @@
 ---
-title: Ruby, OCI8 and an M1 Mac
-date: 2023-03-24
 layout: post
+title: Ruby, OCI8 and an M1 Mac
+subtitle: A guide to navigating using Oracle Instant Client & Ruby on M1 arm64 architecture
+author: Stuart Frost
+date: 2023-03-24
 tags:
   - tutorial
   - m1

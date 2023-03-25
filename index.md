@@ -1,8 +1,5 @@
 ---
-title: stufro
+title: Stuart Frost
 layout: home
 logo: "/assets/logo.svg"
 ---
-
-# stufro | software developer
-My name is Stuart, I like writing software.
