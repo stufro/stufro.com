@@ -1,6 +1,8 @@
 ---
-title: Welcome to my blog
+title: Stuart Frost
+layout: home
+background: /assets/ruby-gem-dark-bg.jpg
 ---
 
-# stufro | software developer
-My name is Stuart, I like software.
+# Posts
+---------
