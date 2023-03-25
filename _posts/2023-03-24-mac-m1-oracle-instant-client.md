@@ -11,23 +11,27 @@ tags:
   - oci8
 ---
 
-This guide you through compiling a version of Ruby in Intel architecture
-(x86_64) instead of the new default Apple architecture (arm64). This is
-only required when using gems such as
-[ruby-oci8](https://www.rubydoc.info/gems/ruby-oci8/file/docs/install-on-osx.md)
-because there is not yet a version of Oracle Instant Client which is
-compatible with arm64 architecture.
+If you're unfortunate enough to need to connect to an Oracle database using Ruby, you will be familiar with the woes
+of having to install [Oracle Instant Client](https://www.oracle.com/uk/database/technologies/instant-client.html)
+to be able to use the [Ruby OCI8 gem](https://rubygems.org/gems/ruby-oci8/versions/2.2.2). I have always found this
+fiddly and it was made yet more fiddly when I started using an M1 Mac last year.
 
-## Step 1 - install Rosetta
+Oracle have yet to release a version of Instant Client that is compatible with M1 arm64 chipsets which means if you
+need to use this gem, it needs a version of Ruby which has been compiled with Intel architecture.
 
-Install Rosetta2, which translates Intel code to ARM (M1).
+This post will guide you through compiling a version of Ruby in Intel architecture
+(x86_64) instead of the new default Apple architecture (arm64).
+
+# Step 1 - install Rosetta
+
+Install Rosetta2, which enables x86_64 compiled code to be run on arm64 M1 processor.
 
     /usr/sbin/softwareupdate --install-rosetta --agree-to-license
 
-## Step 2 - check current brew installation
+# Step 2 - check current brew installation
 
 First check whether your Brew is installed in arm64 or x86_64
-architecture. By default it is likely to be arm64.
+architecture. If you installed Brew normally it is likely to be arm64.
 
     which brew
     # arm64 location: /opt/homebrew/bin/brew
@@ -36,35 +40,34 @@ architecture. By default it is likely to be arm64.
 If your brew is installed in the x86_64 location skip to step 4,
 otherwise carry on.
 
-## Step 3 - install Intel compiled Brew
+# Step 3 - install Intel compiled Brew
 
     arch --x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-For ease of use, it's wise to setup an alias so you can differentiate
-between using arm64 brew and x86_64 brew. Add the following to your
-.zshrc or relevant terminal config. I decided to call mine ibrew short
+This will install another instance of brew in `/usr/local/` which is the x86_64 location, leaving your existing arm64 Brew
+in place in `/opt/hombrew/`.
+
+In order to easily switch between running commands using the two versions of Brew, I setup an alias.
+Add the following to your .zshrc or relevant terminal config. I decided to call mine ibrew short
 for Intel Brew. You can call it something else if you want.
 
     alias ibrew='arch --x86_64 /usr/local/Homebrew/bin/brew'
 
-## Step 4 - install Intel compiled versions of key dependencies
+# Step 4 - install Intel compiled versions of key dependencies
 
-    # check xcode, should yield : /Library/Developer/CommandLineTools
-    xcode-select -p
-
-    # check xcode, should yield : xcode-select version 2384
+    # check if xcode is installed
     xcode-select -v
 
     # install xcode-select if not installed
     xcode-select --install
 
-    # install key dependencies for compiling Ruby
+    # install key dependencies for compiling Ruby using our new Intel Brew
     ibrew install openssl readline libyaml zlib bison bison@2.7
 
-    # if you're likely to use the pg, mysql gems (if you're working on NOC tools for example) install these additional packages
+    # install any other dependencies you know your gems will need, e.g. if you're using pg or mysql.
     ibrew install libpq mysql
 
-## Step 5 - install Intel compiled Ruby version
+# Step 5 - install Intel compiled Ruby version
 
 Set these environment variables before installing Ruby to tell it where
 the key dependencies are installed.
@@ -76,27 +79,24 @@ the key dependencies are installed.
 Choose one of the below, which ever is your Ruby version manager of
 choice:
 
-### asdf
+## asdf
 
-    arch -x86_64 asdf install ruby <ruby_version_of_project>
+    arch -x86_64 asdf install ruby <version>
 
-### rbenv
+## rbenv
 
-    arch -x86_64 rbenv install <ruby_version_of_project>
+    arch -x86_64 rbenv install <version>
 
 # Troubleshooting
 
-## Ruby won't install
+## Ruby install fails
 
-First try to run the install again, sometimes it installs correctly on
-the second attempt. If the retry does not work:
+First try to run the install again, sometimes it installs correctly on the second attempt. If the retry does not work:
 
-After an update to xcode on 4th November, I could no longer install any
-Ruby version. Following [this
-guidance](https://bugs.ruby-lang.org/issues/18912), I had to downgrade
-xcode to version 13 for it to work.
+After an update to xcode on 4th November 2022, I could no longer install any Ruby version.
+Following [this guidance](https://bugs.ruby-lang.org/issues/18912), I had to downgrade xcode to version 13 for it to work.
 
-## I can't bundle install
+## Bundle install fails
 
 ### mysql2
 
@@ -124,12 +124,7 @@ your machine you can run `ibrew --prefix openssl@1.1` and
 
     gem install rdkafka
 
-## Can I just reinstall rbenv/ruby in Rosetta mode instead of going all the way back to Brew?
-
-We didn't attempt this in the fear of mixing packages and the
-architectures they were installed under. Though, feel free to try and
-report back your findings.
-
-**Update November 2022:** This doesn't seem possible, you need an intel
-version of Brew installed so that you can install intel versions of key
-Ruby dependencies such as readline and openssl.
+# Conclusion
+That's about all the tips I can give you based on my experiences of using this Gem on my M1 since
+last year, let me know if it still doesn't work for you or if there's anything missing from this
+set of instructions.
