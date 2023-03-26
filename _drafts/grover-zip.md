@@ -50,7 +50,7 @@ download their set list as a ZIP file containing separate PDFs.
 In my naivity I had assumed this would involve generating each PDF and saving it to disk in turn, creating a .zip file from these PDFs
 before serving that file up to the user and doing some inevitable cleanup. So you can imagine my joy when I discovered `Zip::OutputStream`.
 
-A built in Ruby library which allows you to generate .zip files on the fly. You call `write_buffer` passing it a block which then allows you
+A built-in Ruby library which allows you to generate .zip files on the fly, you call `write_buffer` passing it a block which then allows you
 to write multiple files to the ZIP file stream.
 
 ```ruby
@@ -84,6 +84,51 @@ end
 ```
 
 # How do you test it?
+As is often the case, working out how best to test something is harder than implementing the solution itself.
+
+Before starting I had written a browser level test using [Cypress](https://www.cypress.io/) which looked like this:
+
+```javascript
+cy.contains("Separate PDFs").click({ force: true })
+
+cy.wait('@file').its('request').then((req) => {
+  cy.request(req)
+    .then(({ body, headers }) => {
+      expect(headers["content-type"]).to.eq("application/zip")
+      expect(headers["content-disposition"]).to.include('filename="My amazing set.zip"')
+    })
+})
+```
+
+This gave me a good integration test to check that a .zip file was served up to the user, with the correct file name.
+
+I also wrote some unit tests around the last which generates the ZIP content. These simply check that the ZIP output stream
+receives the correct method calls with the right parameters
+
+```ruby
+let(:grover) { instance_double Grover, :grover, to_pdf: :some_pdf }
+
+before do
+  allow(Grover).to receive(:new).and_return grover
+  allow(Zip::OutputStream).to receive(:write_buffer).and_yield zip_io
+end
+
+it "generates a zip file of all the chord sheet PDFs" do
+  subject.export
+  expect(zip_io).to have_received(:put_next_entry).with("1 - Foo.pdf")
+end
+
+it "writes each pdf content" do
+  subject.export
+  expect(zip_io).to have_received(:write).with(:some_pdf)
+end
+```
+
+That gave me enough confidence in my feature going forwards. In hindsight, the tests are lacking in confirming the content of the PDF files.
+My code could render a ZIP file full of blank PDFs and my test suite would give me the green light.
+
+To remedy this we could update the the Cypress test to check the contents of each PDF (by taking a digest of the file contents to compare in our test),
+or write some view tests to check the HTML template renders everything we're expecting. Or perhaps both!
 
 # Conclusion
 I love it when you have a problem and you find libraries as good as Grover & Puppeteer which help you solve it in such as easy and elegant way.
