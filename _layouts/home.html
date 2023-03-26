@@ -33,7 +33,9 @@ layout: default
         {% for post in site.posts limit : 5 %}
 
         <div class="d-flex align-items-center justify-content-center flex-wrap flex-md-nowrap">
-          <div style="background-image: url({{ post.background | prepend: site.baseurl }}); background-position-x: center; background-size: 10em; height: 6em; width: 10em; border-radius: 1rem; margin-right: 1rem"></div>
+          <a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">
+            <div style="background-image: url({{ post.background | prepend: site.baseurl }}); background-position-x: center; background-size: 10em; height: 6em; width: 8em; border-radius: 1rem; margin-right: 1rem"></div>
+          </a>
           <article class="post-preview">
             <a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">
               <h2 class="post-title">{{ post.title }}</h2>

@@ -3,6 +3,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="{{ page.url | prepend: site.url }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ page.title }}">
+  {% if page.subtitle %}
+    <meta property="og:description" content="{{ page.subtitle }}">
+  {% endif %}
+  <meta property="og:image" content="{{ page.background | prepend: site.url }}">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="www.stufro.com">
+  <meta property="twitter:url" content="{{ page.url | prepend: site.url }}">
+  <meta name="twitter:title" content="{{ page.title }}">
+  {% if page.subtitle %}
+    <meta name="twitter:description" content="{{ page.subtitle }}">
+  {% endif %}
+  <meta name="twitter:image" content="{{ page.background | prepend: site.url }}">
+
   <title>
     {% if page.title %}{{ page.title | escape }} - {{ site.title | escape }}
     {% else %}{{ site.title | escape }}{% endif %}
@@ -15,9 +34,9 @@
 
   <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" href="{{"/assets/main.css" | relative_url }}">
+  <link rel="stylesheet" href='{{"/assets/main.css" | relative_url }}'>
   <link rel="stylesheet" href="/assets/syntax.css">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
-  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | relative_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href='{{ " /feed.xml" | relative_url }}'>
 
 </head>
