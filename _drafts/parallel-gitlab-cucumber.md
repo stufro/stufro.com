@@ -15,7 +15,7 @@ to spend time pruning and optimising your CI build.
 
 Our build time had been slowly creeping up as build times do and whilst we had spent time pruning unused features and only running
 scenarios in a headless browser when necessary, we were still in a predicament. Our CI pipeline was taking between 50 mins and 1 hour
-to complete, nearly all of that time was just running our Cucumber tests.
+to complete, nearly all of that time was running our Cucumber tests.
 
 While this problem may point to other bigger questions such as "is this application doing too much?", "should we split this into separate
 apps?" and "how did it get this slow?", such questions rarely have a quick and cheap answer.
@@ -44,12 +44,8 @@ cucumber:
       - log/cucumber.html
 ```
 
-Each block will become a job and there's a config option in the GitLab runners `config.toml` file which defines the number of concurrent jobs
-which can run.
-
-```toml
-concurrent = 8
-```
+Each block will become a job and there's a `concurrent` config option in the GitLab runners `config.toml` file which defines the number of concurrent jobs
+which can run at once.
 
 <figure>
   <img src="/assets/post-content/gitlab-jobs.png" width="200" alt="GitLab Jobs">
@@ -73,3 +69,62 @@ cucumber2:
 ```
 
 # Slicing the Cucumber
+Using this environment variable, we were able to decide which portion of the features to run on each job. The next thing was to implement the slicing up
+of our feature tests.
+
+As a first pass, we simply split the `.feature` files between each job to prove the idea. To actually do this, it was a case of modifying our
+rake task, passing the list of feature files we want to run as a string to `t.cucumber_opts=`.
+
+We find all the `.feature` files in our project, work out how many files to run on each job and then call `Array#in_groups_of` to split the files
+into separate arrays.
+
+```ruby
+Cucumber::Rake::Task.new do |t|
+  feature_files = Dir.glob(Rails.root.join("features/**/*.feature"))
+  group_size = feature_files.count / 4
+  grouped_features = feature_files.in_groups_of(group_size)
+  t.cucumber_opts = grouped_features[ARGV[1].to_i - 1].compact.join(" ")
+  # ...
+end
+```
+
+This comes with a problem. Some feature files will have more scenarios than others. Using this approach resulted in one of the jobs running
+twice any many scenarios as another meaning the load wasn't evenly spread between the jobs.
+
+To improve this we decided we needed to split the feature files based on the number of scenarios in each file.
+
+```ruby
+class CucumberSlicer
+  def initialize(slices:)
+    @slices = slices
+  end
+
+  def slice
+    feature_files = Dir.glob("features/**/*.feature")
+
+    sorted_features = feature_files.map { |filepath| [filepath, scenario_count(filepath)] }
+                                   .sort_by { |_file, count| count }
+                                   .map { |file, _| file }
+
+    populate_slices(initialize_slices, 0, sorted_features)
+  end
+
+  private
+
+  def scenario_count(filepath)
+    File.open(filepath).grep(/Scenario:/).count
+  end
+
+  def populate_slices(slices, slice_index, features)
+    return slices if features.count.zero?
+
+    slices[slice_index] << features.pop
+
+    populate_slices(slices, (slice_index + 1) % @slices, features)
+  end
+
+  def initialize_slices
+    Array.new(@slices) { [] }
+  end
+end
+```
