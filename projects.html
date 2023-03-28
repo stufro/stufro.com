@@ -4,13 +4,35 @@ layout: page
 background: /assets/projects.jpg
 ---
 
-<div class="card" style="width: 18rem;">
-  <a href="https://www.chordly.co.uk" target="_blank">
-    <img src="/assets/chordly.png" class="card-img-top" alt="Screenshot of my application Chordly">
-  </a>
-  <div class="card-body">
-    <h5 class="card-title">Chordly</h5>
-    <p class="card-text">An open-source, online chord sheet creator that allows musicians to quickly transpose chords, create set lists and export to PDF.</p>
-    <a href="https://www.chordly.co.uk" class="btn btn-primary" target="_blank">Visit Chordly</a>
+<div class="d-flex flex-wrap justify-content-center" style="gap: 2em">
+  <div class="card" style="width: 18rem; flex-grow: 1">
+    <a href="https://www.chordly.co.uk" style="height: 12em; overflow-y: hidden" target="_blank">
+      <img src="/assets/chordly.png" class="card-img-top" alt="Screenshot of my application Chordly">
+    </a>
+    <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between">
+      <div>
+        <h5 class="card-title">Chordly</h5>
+        <p class="card-text">An open-source, online chord sheet creator written in Rails that allows musicians to
+          quickly transpose chords,
+          create set lists and export to PDF.</p>
+      </div>
+      <a href="https://www.chordly.co.uk" class="btn btn-primary mt-3" target="_blank">Visit Chordly</a>
+    </div>
+  </div>
+
+  <div class="card" style="width: 18rem; flex-grow: 1">
+    <a href="https://legendary-snickerdoodle-97ba6b.netlify.app/" style="height: 12em; overflow-y: hidden"
+      target="_blank">
+      <img src="/assets/git-stats.png" class="card-img-top" alt="Screenshot of my application Chordly">
+    </a>
+    <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between">
+      <div>
+        <h5 class="card-title">Git Stats</h5>
+        <p class="card-text">A hobby project written in Elm which uses the GitHub API to fetch statistics about users.
+          There's also a small backend written in node.js which runs on an AWS Lambda via Netlify Functions.</p>
+      </div>
+      <a href="https://legendary-snickerdoodle-97ba6b.netlify.app/" class="btn btn-primary mt-3" target="_blank">Visit Git
+        Stats</a>
+    </div>
   </div>
 </div>
