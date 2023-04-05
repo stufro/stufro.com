@@ -21,8 +21,8 @@ While this problem may point to other bigger questions such as "is this applicat
 apps?" and "how did it get this slow?", such questions rarely have a quick and cheap answer.
 
 # Parallelizing
-One quick win which often yields results is running your tests in parallel, there's a popular gem called [parallel_tests](https://github.com/grosser/parallel_tests)
-which allows you to run Test::Unit, RSpec, Cucumber or Spinach in parallel on multiple CPU cores.
+One quick win which often yields results is running your tests in parallel. There's a popular gem called [parallel_tests](https://github.com/grosser/parallel_tests)
+which allows you to run Test::Unit, RSpec, Cucumber or Spinach in parallel on multiple CPU cores concurrently. 
 
 We had used this gem in the project in the past but removed it after facing many issues with flapping tests and timeouts. I suspect this was
 no fault of the gem, rather our use of it or poor tests causing side effects.
@@ -30,7 +30,7 @@ no fault of the gem, rather our use of it or poor tests causing side effects.
 Either way, this post will describe an alternative approach using concurrent GitLab jobs.
 
 # GitLab jobs
-To define a GitLab job it's a simple case of adding a block to our `.gitlab-ci.yml` file.
+To define a GitLab job it's a simple case of adding a block to the `.gitlab-ci.yml` file.
 
 ```yaml
 cucumber:
@@ -83,15 +83,38 @@ Cucumber::Rake::Task.new do |t|
   feature_files = Dir.glob(Rails.root.join("features/**/*.feature"))
   group_size = feature_files.count / 4
   grouped_features = feature_files.in_groups_of(group_size)
-  t.cucumber_opts = grouped_features[ARGV[1].to_i - 1].compact.join(" ")
+  t.cucumber_opts = grouped_features[ENV["CUCUMBER_GROUP"].to_i - 1].compact.join(" ")
   # ...
 end
 ```
 
+## Evenly spreading the load
 This comes with a problem. Some feature files will have more scenarios than others. Using this approach resulted in one of the jobs running
 twice any many scenarios as another meaning the load wasn't evenly spread between the jobs.
 
-To improve this we decided we needed to split the feature files based on the number of scenarios in each file.
+To improve this we decided we needed to split the feature files based on the number of scenarios in each file. The regular expression below will also match *scenario template thingies*
+
+```ruby
+def scenario_count(filepath)
+  File.open(filepath).grep(/Scenario:/).count
+end
+```
+
+Once we had the count for each file, we can sort the features by the number of scenarios.
+
+```ruby
+sorted_features = feature_files.map { |filepath| [filepath, scenario_count(filepath)] }
+                                   .sort_by { |_file, count| count }
+                                   .map { |file, _| file }
+```
+
+Now all that's left to do is distribute the features between a number of arrays equal to the number of GitLab jobs we have. 
+
+To do this we wrote a small recursive method to place the feature files sequentially into each array. 
+
+*diagram*
+
+If you would like to try a similar approach the full code is below. 
 
 ```ruby
 class CucumberSlicer
@@ -128,3 +151,6 @@ class CucumberSlicer
   end
 end
 ```
+
+## Using the slicer
+We can now update our Rake task to use our new slicer. 
