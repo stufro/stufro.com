@@ -29,7 +29,7 @@ no fault of the gem, rather our use of it or poor tests causing side effects.
 
 Either way, this post will describe an alternative approach using concurrent GitLab jobs.
 
-# GitLab jobs
+# A different approach - GitLab jobs
 To define a GitLab job it's a simple case of adding a block to the `.gitlab-ci.yml` file.
 
 ```yaml
