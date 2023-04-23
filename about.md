@@ -1,13 +1,13 @@
 ---
 title: about
 layout: page
-background: /assets/about-background.jpg
+background: /assets/pages/about-background.jpg
 ---
 
 # About Me
 
 <div class="d-flex justify-content-center">
-  <img src="assets/avatar.jpeg" width="200" alt="Profile Picture">
+  <img src="assets/pages/avatar.jpeg" width="200" alt="Profile Picture">
 </div>
 
 I am a software developer with 7 years experience, primaily writing Ruby on Rails applications.

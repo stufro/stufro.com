@@ -3,7 +3,7 @@ layout: post
 title: Parallelizing Cucumber tests on GitLab runners
 subtitle: How we took our build time from 1 hour to 25 minutes in an afternoon
 author: Stuart Frost
-background: /assets/cucumber.jpg
+background: /assets/post-content/cucumber.jpg
 tags:
   - cucumber
   - gitlab
@@ -22,7 +22,7 @@ apps?" and "how did it get this slow?", such questions rarely have a quick and c
 
 # Parallelizing
 One quick win which often yields results is running your tests in parallel. There's a popular gem called [parallel_tests](https://github.com/grosser/parallel_tests)
-which allows you to run Test::Unit, RSpec, Cucumber or Spinach in parallel on multiple CPU cores concurrently. 
+which allows you to run Test::Unit, RSpec, Cucumber or Spinach in parallel on multiple CPU cores concurrently.
 
 We had used this gem in the project in the past but removed it after facing many issues with flapping tests and timeouts. I suspect this was
 no fault of the gem, rather our use of it or poor tests causing side effects.
@@ -108,13 +108,13 @@ sorted_features = feature_files.map { |filepath| [filepath, scenario_count(filep
                                    .map { |file, _| file }
 ```
 
-Now all that's left to do is distribute the features between a number of arrays equal to the number of GitLab jobs we have. 
+Now all that's left to do is distribute the features between a number of arrays equal to the number of GitLab jobs we have.
 
-To do this we wrote a small recursive method to place the feature files sequentially into each array. 
+To do this we wrote a small recursive method to place the feature files sequentially into each array.
 
 *diagram*
 
-If you would like to try a similar approach the full code is below. 
+If you would like to try a similar approach the full code is below.
 
 ```ruby
 class CucumberSlicer
@@ -153,4 +153,4 @@ end
 ```
 
 ## Using the slicer
-We can now update our Rake task to use our new slicer. 
+We can now update our Rake task to use our new slicer.
