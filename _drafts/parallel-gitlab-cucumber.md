@@ -29,7 +29,7 @@ no fault of the gem, rather our use of it or poor tests causing side effects.
 
 Either way, this post will describe an alternative approach using concurrent GitLab jobs.
 
-# A different approach - GitLab jobs
+# Alternative approach - GitLab jobs
 To define a GitLab job it's a simple case of adding a block to the `.gitlab-ci.yml` file.
 
 ```yaml
@@ -49,7 +49,7 @@ which can run at once.
 
 <figure>
   <img src="/assets/post-content/gitlab-jobs.png" width="200" alt="GitLab Jobs">
-  <small><figcaption>GitLab jobs configured in `gitlab-ci.yml` shown on the UI</figcaption></small>
+  <small><figcaption>Jobs configured in `gitlab-ci.yml` shown on the GitLab UI</figcaption></small>
 </figure>
 
 We changed our config to have multiple cucumber jobs, setting an environment variable to give each job an ID.
@@ -69,6 +69,7 @@ cucumber2:
 ```
 
 # Slicing the Cucumber
+## Approach 1
 Using this environment variable, we were able to decide which portion of the features to run on each job. The next thing was to implement the slicing up
 of our feature tests.
 
@@ -88,69 +89,60 @@ Cucumber::Rake::Task.new do |t|
 end
 ```
 
-## Evenly spreading the load
+## Approach 2 - evenly spreading the load
 This comes with a problem. Some feature files will have more scenarios than others. Using this approach resulted in one of the jobs running
 twice any many scenarios as another meaning the load wasn't evenly spread between the jobs.
 
-To improve this we decided we needed to split the feature files based on the number of scenarios in each file. The regular expression below will also match *scenario template thingies*
+To improve this we decided we needed to split the feature files based on the number of scenarios in each file. The regular expression below will also include the number of scenario outlines.
 
 ```ruby
 def scenario_count(filepath)
-  File.open(filepath).grep(/Scenario:/).count
+  File.open(filepath).grep(/Scenario:|(?<!Examples:\s)^\s*\|/).count
 end
 ```
 
 Once we had the count for each file, we can sort the features by the number of scenarios.
 
 ```ruby
-sorted_features = feature_files.map { |filepath| [filepath, scenario_count(filepath)] }
-                                   .sort_by { |_file, count| count }
-                                   .map { |file, _| file }
+feature_files.map { |filepath| [filepath, scenario_count(filepath)] }
+             .sort_by { |_file, count| count }
+             .map { |file, _count| file }
 ```
 
 Now all that's left to do is distribute the features between a number of arrays equal to the number of GitLab jobs we have.
 
 To do this we wrote a small recursive method to place the feature files sequentially into each array.
 
-*diagram*
-
-If you would like to try a similar approach the full code is below.
+<figure style="text-align: center">
+  <img style="width: 100%" src="/assets/post-content/cucumber-recursive-method.png" alt="Diagram demonstrating how recursive method works">
+  <small><figcaption>Visual representation of how the recursive method works</figcaption></small>
+</figure>
 
 ```ruby
-class CucumberSlicer
-  def initialize(slices:)
-    @slices = slices
-  end
+def populate_slices(slices, slice_index, features)
+  return slices if features.count.zero?
 
-  def slice
-    feature_files = Dir.glob("features/**/*.feature")
+  slices[slice_index] << features.pop
 
-    sorted_features = feature_files.map { |filepath| [filepath, scenario_count(filepath)] }
-                                   .sort_by { |_file, count| count }
-                                   .map { |file, _| file }
-
-    populate_slices(initialize_slices, 0, sorted_features)
-  end
-
-  private
-
-  def scenario_count(filepath)
-    File.open(filepath).grep(/Scenario:/).count
-  end
-
-  def populate_slices(slices, slice_index, features)
-    return slices if features.count.zero?
-
-    slices[slice_index] << features.pop
-
-    populate_slices(slices, (slice_index + 1) % @slices, features)
-  end
-
-  def initialize_slices
-    Array.new(@slices) { [] }
-  end
+  populate_slices(slices, (slice_index + 1) % @num_slices, features)
 end
 ```
 
-## Using the slicer
-We can now update our Rake task to use our new slicer.
+If you would like to try a similar approach check out the whole class [on GitHub](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version1-rb).
+
+## Approach 3 - limitting how big a group can get
+
+The recursive approach got us good results, good enough to push to main and start feeling the benefit of the time saving. However, Glenn felt we could still shave a few more minutes off. The recursive approach above can still result in the groups being unbalanced when there is a large disparity between scenario counts of the feature files.
+
+# Using the slicer
+It was then just a case of updating our Rake task to use our `CucumberSlicer` class.
+
+```ruby
+Cucumber::Rake::Task.new({ ok: "test:prepare" }, "Run features that should pass") do |t|
+  if ENV["CUCUMBER_GROUP"].present?
+    sliced_features = CucumberSlicer.slice(num_slices: 5)
+    t.cucumber_opts = sliced_features[ENV["CUCUMBER_GROUP"].to_i - 1].compact.join(" ")
+  end
+  # ...
+end
+```
