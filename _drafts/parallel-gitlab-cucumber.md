@@ -22,9 +22,9 @@ apps?" and "how did it get this slow?", such questions rarely have a quick and c
 
 # Parallelizing
 One quick win which often yields results is running your tests in parallel. There's a popular gem called [parallel_tests](https://github.com/grosser/parallel_tests)
-which allows you to run Test::Unit, RSpec, Cucumber or Spinach in parallel on multiple CPU cores concurrently.
+which allows you to run Test::Unit, RSpec, Cucumber or Spinach tests in parallel on multiple CPU cores concurrently.
 
-We had used this gem in the project in the past but removed it after facing many issues with flapping tests and timeouts. I suspect this was
+We had used this gem in the past but removed it after facing many issues with flapping tests and timeouts. I suspect this was
 no fault of the gem, rather our use of it or poor tests causing side effects.
 
 Either way, this post will describe an alternative approach using concurrent GitLab jobs.
@@ -37,11 +37,6 @@ cucumber:
   extends: .test
   script:
     - bundle exec rake cucumber
-  coverage: /\(\d+.\d+\%\) covered/
-  artifacts:
-    when: always
-    paths:
-      - log/cucumber.html
 ```
 
 Each block will become a job and there's a `concurrent` config option in the GitLab runners `config.toml` file which defines the number of concurrent jobs
@@ -69,15 +64,18 @@ cucumber2:
 ```
 
 # Slicing the Cucumber
-## Approach 1
 Using this environment variable, we were able to decide which portion of the features to run on each job. The next thing was to implement the slicing up
 of our feature tests.
 
-As a first pass, we simply split the `.feature` files between each job to prove the idea. To actually do this, it was a case of modifying our
+## Approach 1 - splitting by files
+
+As a first pass, we simply split the `.feature` files between each job. To actually do this, it was a case of modifying our
 rake task, passing the list of feature files we want to run as a string to `t.cucumber_opts=`.
 
 We find all the `.feature` files in our project, work out how many files to run on each job and then call `Array#in_groups_of` to split the files
 into separate arrays.
+
+Then we can use the `CUCUMBER_GROUP` variable to pick the appropriate group.
 
 ```ruby
 Cucumber::Rake::Task.new do |t|
@@ -89,11 +87,13 @@ Cucumber::Rake::Task.new do |t|
 end
 ```
 
-## Approach 2 - evenly spreading the load
-This comes with a problem. Some feature files will have more scenarios than others. Using this approach resulted in one of the jobs running
+Approach 1 comes with a problem. Some feature files will have more scenarios than others. Using this approach resulted in one of the jobs running
 twice any many scenarios as another meaning the load wasn't evenly spread between the jobs.
 
-To improve this we decided we needed to split the feature files based on the number of scenarios in each file. The regular expression below will also include the number of scenario outlines.
+## Approach 2 - evenly spreading the load
+_tl;dr [view full solution](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version1-rb)._
+
+To improve the distribution between jobs we decided we needed to split the feature files based on the number of scenarios in each file. The regular expression below will also include the number of scenario outlines.
 
 ```ruby
 def scenario_count(filepath)
@@ -128,17 +128,55 @@ def populate_slices(slices, slice_index, features)
 end
 ```
 
-If you would like to try a similar approach check out the whole class [on GitHub](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version1-rb).
+The recursive approach got us good results, good enough to push to main and start feeling the benefit of the time saving. However, Glenn felt we could still shave a few more minutes off.
 
 ## Approach 3 - limitting how big a group can get
+_tl;dr [view full solution](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version2-rb)._
 
-The recursive approach got us good results, good enough to push to main and start feeling the benefit of the time saving. However, Glenn felt we could still shave a few more minutes off. The recursive approach above can still result in the groups being unbalanced when there is a large disparity between scenario counts of the feature files.
+The recursive approach above can still result in the groups being unbalanced when there is a large disparity between scenario counts of the feature files.
 
-# Using the slicer
-It was then just a case of updating our Rake task to use our `CucumberSlicer` class.
+To resolve this we needed to set a limit of how many scenarios each group should hold. We changed out slices array to be an array of hashes, so we could store the filepath strings along with the number of scenarios in each group at any one time.
 
 ```ruby
-Cucumber::Rake::Task.new({ ok: "test:prepare" }, "Run features that should pass") do |t|
+def initialize_slices(num_slices)
+  Array.new(num_slices) { { scenario_count: 0, feature_filepaths: [] } }
+end
+```
+
+Our feature_files also becomes a hash so we can access it's scenario count and filepath e.g. `{ scenario_count: 14, feature_filepath: "features/login.feature" }`
+
+Then we can loop oevr our feature files and find the next available group which has capacity to hold the feature file before adding the feature to the group.
+
+```ruby
+slices = initialize_slices(num_slices)
+features_files.each do |feature|
+  slice = pick_a_slice(slices, feature[:scenario_count], average_scenario_count)
+  add_feature_to_a_slice(feature, slice)
+end
+```
+
+Let's unpick these methods a bit. `pick_a_slice` uses `Enumerable#find` to find the first slice where the slices current scenario count + the feature we're trying to add to it is less than or equal to the limit.
+
+```ruby
+def pick_a_slice(slices, feature_size, target_size)
+  slices.find { |slice| (slice[:scenario_count] + feature_size) < target_size }
+end
+```
+
+Once we've found the slice with available space, we update the slices count and add the feature filepath to it.
+
+```ruby
+def add_feature_to_a_slice(feature, slice)
+  slice[:scenario_count] += feature[:scenario_count]
+  slice[:feature_filepaths] << feature[:feature_filepath]
+end
+```
+
+# Using the slicer
+Back in our Rake task it was then just a case of updating our Rake task to use our `CucumberSlicer` class.
+
+```ruby
+Cucumber::Rake::Task.new do |t|
   if ENV["CUCUMBER_GROUP"].present?
     sliced_features = CucumberSlicer.slice(num_slices: 5)
     t.cucumber_opts = sliced_features[ENV["CUCUMBER_GROUP"].to_i - 1].compact.join(" ")
