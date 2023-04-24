@@ -3,22 +3,25 @@ layout: post
 title: Parallelizing Cucumber tests on GitLab runners
 subtitle: How we took our build time from 1 hour to 25 minutes in an afternoon
 author: Stuart Frost
+date: 2023-04-24
 background: /assets/post-content/cucumber.jpg
 tags:
   - cucumber
   - gitlab
-  - CI
+  - CI/CD
 ---
 
 When you're working on a Rails application with ~100 feature files containing a total of 685 scenarios, it's really important
 to spend time pruning and optimising your CI build.
 
-Our build time had been slowly creeping up as build times do and whilst we had spent time pruning unused features and only running
-scenarios in a headless browser when necessary, we were still in a predicament. Our CI pipeline was taking between 50 mins and 1 hour
+Our build time had been slowly creeping up and whilst we had spent time pruning our features and only running
+scenarios in a headless browser where necessary, we were still in a predicament. Our CI pipeline was taking between 50 mins and 1 hour
 to complete, nearly all of that time was running our Cucumber tests.
 
 While this problem may point to other bigger questions such as "is this application doing too much?", "should we split this into separate
 apps?" and "how did it get this slow?", such questions rarely have a quick and cheap answer.
+
+Therefore I paired up with my colleague [Glenn Baker](https://www.linkedin.com/in/glenncarlbaker/) and we set to work in pursuit of a solution.
 
 # Parallelizing
 One quick win which often yields results is running your tests in parallel. There's a popular gem called [parallel_tests](https://github.com/grosser/parallel_tests)
@@ -93,11 +96,11 @@ twice any many scenarios as another meaning the load wasn't evenly spread betwee
 ## Approach 2 - evenly spreading the load
 _tl;dr [view full solution](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version1-rb)._
 
-To improve the distribution between jobs we decided we needed to split the feature files based on the number of scenarios in each file. The regular expression below will also include the number of scenario outlines.
+To improve the distribution between jobs we decided to split the feature files based on the number of scenarios in each file. The regular expression below will also include the number of [scenario outlines](https://cucumber.io/docs/gherkin/reference/#scenario-outline).
 
 ```ruby
 def scenario_count(filepath)
-  File.open(filepath).grep(/Scenario:|(?<!Examples:\s)^\s*\|/).count
+  File.read(filepath).scan(/Scenario:|(?<!Examples:\s)^\s*\|/).count
 end
 ```
 
@@ -111,7 +114,7 @@ feature_files.map { |filepath| [filepath, scenario_count(filepath)] }
 
 Now all that's left to do is distribute the features between a number of arrays equal to the number of GitLab jobs we have.
 
-To do this we wrote a small recursive method to place the feature files sequentially into each array.
+To do this we wrote a small recursive method to place the feature files sequentially into each array. This works through the ordered features and places each one into subsequent groups.
 
 <figure style="text-align: center">
   <img style="width: 100%" src="/assets/post-content/cucumber-recursive-method.png" alt="Diagram demonstrating how recursive method works">
@@ -128,14 +131,14 @@ def populate_slices(slices, slice_index, features)
 end
 ```
 
-The recursive approach got us good results, good enough to push to main and start feeling the benefit of the time saving. However, Glenn felt we could still shave a few more minutes off.
+The recursive approach achieved good results, good enough to push to main and start feeling the benefit of the time saving. However, Glenn and I felt we could still shave a few more minutes off.
 
 ## Approach 3 - limitting how big a group can get
 _tl;dr [view full solution](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version2-rb)._
 
 The recursive approach above can still result in the groups being unbalanced when there is a large disparity between scenario counts of the feature files.
 
-To resolve this we needed to set a limit of how many scenarios each group should hold. We changed out slices array to be an array of hashes, so we could store the filepath strings along with the number of scenarios in each group at any one time.
+To resolve this we needed to set a limit of how many scenarios each group should hold. We changed our slices array to be an array of hashes, so we could store the filepath strings along with the number of scenarios each group has at any one time.
 
 ```ruby
 def initialize_slices(num_slices)
@@ -143,9 +146,9 @@ def initialize_slices(num_slices)
 end
 ```
 
-Our feature_files also becomes a hash so we can access it's scenario count and filepath e.g. `{ scenario_count: 14, feature_filepath: "features/login.feature" }`
+Our `feature_files` also becomes an array of hashes so we can store a each feature's scenario count and filepath e.g. `{ scenario_count: 14, feature_filepath: "features/login.feature" }`
 
-Then we can loop oevr our feature files and find the next available group which has capacity to hold the feature file before adding the feature to the group.
+Then we can loop over our feature files and find the next available group which has capacity to hold the feature file before adding the feature to the group.
 
 ```ruby
 slices = initialize_slices(num_slices)
@@ -155,7 +158,7 @@ features_files.each do |feature|
 end
 ```
 
-Let's unpick these methods a bit. `pick_a_slice` uses `Enumerable#find` to find the first slice where the slices current scenario count + the feature we're trying to add to it is less than or equal to the limit.
+Let's unpick these methods a bit. `pick_a_slice` uses `Enumerable#find` to find the first slice where the slices current scenario count + the feature we're trying to add to it is less than the limit.
 
 ```ruby
 def pick_a_slice(slices, feature_size, target_size)
@@ -163,7 +166,7 @@ def pick_a_slice(slices, feature_size, target_size)
 end
 ```
 
-Once we've found the slice with available space, we update the slices count and add the feature filepath to it.
+Once we've found the slice with available space, we update the slice's count and add the feature filepath to it.
 
 ```ruby
 def add_feature_to_a_slice(feature, slice)
@@ -184,3 +187,11 @@ Cucumber::Rake::Task.new do |t|
   # ...
 end
 ```
+
+# Conclusion
+All in all it was well worth the effort spent, over halving our pipeline run time. There's still work to do but having our pipelines like the one below finish within around 25 minutes has been a breath of fresh air for the whole development team.
+
+<figure style="text-align: center">
+  <img src="/assets/post-content/concurrent-cucumber-result.png" style="width: 100%" alt="GitLab Jobs">
+  <small><figcaption>Screenshot of recent GitLab pipeline</figcaption></small>
+</figure>
