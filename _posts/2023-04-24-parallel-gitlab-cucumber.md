@@ -91,7 +91,7 @@ end
 ```
 
 Approach 1 comes with a problem. Some feature files will have more scenarios than others. Using this approach resulted in one of the jobs running
-twice any many scenarios as another meaning the load wasn't evenly spread between the jobs.
+twice as many scenarios as another meaning the load wasn't evenly spread between the jobs.
 
 ## Approach 2 - evenly spreading the load
 _tl;dr [view full solution](https://gist.github.com/stufro/71ebea8cc89925837bd42e84bb0c5b5c#file-version1-rb)._
@@ -146,7 +146,7 @@ def initialize_slices(num_slices)
 end
 ```
 
-Our `feature_files` also becomes an array of hashes so we can store a each feature's scenario count and filepath e.g. `{ scenario_count: 14, feature_filepath: "features/login.feature" }`
+Our `feature_files` also becomes an array of hashes so we can store each feature's scenario count and filepath e.g. `{ scenario_count: 14, feature_filepath: "features/login.feature" }`
 
 Then we can loop over our feature files and find the next available group which has capacity to hold the feature file before adding the feature to the group.
 
