@@ -4,7 +4,7 @@ layout: default
 
 <!-- Page Header -->
 {% if page.background %}
-<header class="masthead" style="background-image: url('{{ page.background | prepend: site.baseurl | replace: '//', '/' }}')">
+<header class="masthead" style="background-image: url('{{ page.background | prepend: site.url }}')">
   {% else %}
   <header class="masthead">
     {% endif %}
@@ -33,11 +33,11 @@ layout: default
         {% for post in site.posts limit : 5 %}
 
         <div class="d-flex align-items-center justify-content-center flex-wrap flex-md-nowrap">
-          <a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">
-            <div style="background-image: url({{ post.background | prepend: site.baseurl }}); background-position-x: center; background-size: 10em; height: 6em; width: 8em; border-radius: 1rem; margin-right: 1rem"></div>
+          <a href="{{ post.url | prepend: site.url }}">
+            <div style="background-image: url({{ post.background | prepend: site.url }}); background-position-x: center; background-size: 10em; height: 6em; width: 8em; border-radius: 1rem; margin-right: 1rem"></div>
           </a>
           <article class="post-preview">
-            <a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">
+            <a href="{{ post.url | prepend: site.url }}">
               <h2 class="post-title">{{ post.title }}</h2>
               {% if post.subtitle %}
               <h3 class="post-subtitle">{{ post.subtitle }}</h3>
@@ -53,7 +53,7 @@ layout: default
               {% endif %}
               on
               {{ post.date | date: '%B %d, %Y' }} &middot; {% include read_time.html content=post.content %}
-              &middot; <a style="color: #6c757d" href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}#disqus_thread"></a>
+              &middot; <a style="color: #6c757d" href="{{ post.url | prepend: site.url }}#disqus_thread"></a>
             </p>
           </article>
         </div>

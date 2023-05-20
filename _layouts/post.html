@@ -4,7 +4,7 @@ layout: default
 
 <!-- Page Header -->
 {% if page.background %}
-<header class="masthead" style="background-image: url('{{ page.background | prepend: site.baseurl | replace: '//', '/' }}')">
+<header class="masthead" style="background-image: url('{{ page.background | prepend: site.url }}')">
   {% else %}
   <header class="masthead">
     {% endif %}
@@ -21,7 +21,7 @@ layout: default
               <a href="#">{% if page.author %}{{ page.author }}{% else %}{{ site.author }}{% endif %}</a>
               on {{ page.date | date: '%B %d, %Y' }} &middot; {% include read_time.html
               content=page.content %}
-              &middot; <a style="color: white" href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}#disqus_thread"></a>
+              &middot; <a style="color: white" href="{{ page.url | prepend: site.url }}#disqus_thread"></a>
             </span>
           </div>
         </div>
@@ -64,12 +64,12 @@ layout: default
 
           {% if page.previous.url %}
           <a class="btn btn-primary float-left"
-            href="{{ page.previous.url | prepend: site.baseurl | replace: '//', '/' }}" data-toggle="tooltip"
+            href="{{ page.previous.url | prepend: site.url }}" data-toggle="tooltip"
             data-placement="top" title="{{ page.previous.title }}">&larr; Previous<span class="d-none d-md-inline">
               Post</span></a>
           {% endif %}
           {% if page.next.url %}
-          <a class="btn btn-primary float-right" href="{{ page.next.url | prepend: site.baseurl | replace: '//', '/' }}"
+          <a class="btn btn-primary float-right" href="{{ page.next.url | prepend: site.url }}"
             data-toggle="tooltip" data-placement="top" title="{{ page.next.title }}">Next<span
               class="d-none d-md-inline">
               Post</span> &rarr;</a>
