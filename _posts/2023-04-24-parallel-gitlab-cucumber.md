@@ -3,6 +3,7 @@ layout: post
 title: Parallelizing Cucumber tests on GitLab runners
 subtitle: How we took our build time from 1 hour to 25 minutes in an afternoon
 author: Stuart Frost
+comments: true
 date: 2023-04-24
 background: /assets/post-content/cucumber.jpg
 tags:

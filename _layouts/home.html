@@ -45,7 +45,7 @@ layout: default
               <h3 class="post-subtitle">{{ post.excerpt | strip_html | truncatewords: 15 }}</h3>
               {% endif %}
             </a>
-            <p class="post-meta">Posted by
+            <p class="post-meta mb-0">Posted by
               {% if post.author %}
               {{ post.author }}
               {% else %}
@@ -53,6 +53,7 @@ layout: default
               {% endif %}
               on
               {{ post.date | date: '%B %d, %Y' }} &middot; {% include read_time.html content=post.content %}
+              &middot; <a style="color: #6c757d" href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}#disqus_thread"></a>
             </p>
           </article>
         </div>

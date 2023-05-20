@@ -3,6 +3,7 @@ layout: post
 title: Crystal - Mocking & Stubbing
 subtitle: Using `inject_mock` in the Spectator shard
 author: Stuart Frost
+comments: true
 # date: 2023-04-24
 background: /assets/post-content/crystal.jpg
 tags:
@@ -24,7 +25,7 @@ From the [Spectator documentation](https://gitlab.com/arctic-fox/spectator/-/wik
 
 Although this approach may get us closer to what we're familiar with in RSpec, it seems it shouldn't be the default choice especially when testing is possible using regular mocks & doubles.
 
-# A simple example
+# A Simple Example
 Let's have a look at a super simplified example to discover how we can use `inject_mock` to mock out methods calls to one of our classes. Suppose we have this code:
 
 ```crystal
