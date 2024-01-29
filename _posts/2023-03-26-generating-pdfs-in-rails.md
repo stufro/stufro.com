@@ -104,7 +104,7 @@ cy.wait('@file').its('request').then((req) => {
 
 This gave me a good integration test to check that a .zip file was served up to the user, with the correct file name.
 
-I also wrote some unit tests around the last which generates the ZIP content. These simply check that the ZIP output stream
+I also wrote some unit tests around the class which generates the ZIP content. These simply check that the ZIP output stream
 receives the correct method calls with the right parameters
 
 ```ruby
