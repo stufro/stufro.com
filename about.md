@@ -10,16 +10,18 @@ background: /assets/pages/about-background.jpg
   <img src="assets/pages/avatar.jpeg" width="200" alt="Profile Picture">
 </div>
 
-I am a software developer with 7 years experience, primaily writing Ruby on Rails applications.
+I am a software developer with 8+ years experience, writing a variety of software applications
 
 To contact me use one of the links in the footer.
 
 ## Technical Skills
-- Programming – primarily with Ruby, some experience with Go & Crystal.
-- Agile software development – using Kanban, working in small iterations with close interaction with customers.
+- Programming – Ruby, Crystal, Go, Javascript & Typescript
+- Agile software development – using Kanban, delivering iteratively with close customer interaction.
 - Software design – developing maintainable code, passionate about best practices and design patterns.
-- Web development – Ruby on Rails, HTML, CSS, JavaScript, Hotwire, RESTful APIs.
+- Web development – Ruby on Rails, HTML, CSS, JavaScript, Hotwire, RESTful APIs. Some experience with React.
 - TDD and BDD – Experience with RSpec, Cucumber, Capybara, Cypress, Mocha & Jest.
-- Databases – PostgreSQL, some experience with MySQL and NoSQL technology such as ElasticSearch & MongoDB.
+- Databases – PostgreSQL & MariaDB, experience with NoSQL technologies such as ElasticSearch & MongoDB.
 - DevOps – provisioning infrastructure with Ansible, resolving live issues and scaling applications.
-- Other languages and skills – Elm, Node.js, Bash, CI/CD (Jenkins & GitLab), Git, Vim, Kafka, Nginx & Grafana.
+- AI/LLMs – developed a PoC experimenting using LLMs (mistral + llama2) to interact with operational documentation.
+- Other skills – Elm, Node.js, Linux, Bash, CI/CD (Jenkins & GitLab), Docker, Git, Vim, Kafka, Nginx & Grafana.
+
