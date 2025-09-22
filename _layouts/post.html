@@ -23,6 +23,13 @@ layout: default
               content=page.content %}
               &middot; <a style="color: white" href="{{ page.url | prepend: site.url }}#disqus_thread"></a>
             </span>
+
+            {% if page.image_attribution %}
+            <br>
+            <span class="meta">
+              <small>{{ page.image_attribution }}</small>
+            </span>
+            {% endif %}
           </div>
         </div>
       </div>

@@ -6,11 +6,7 @@ background: /assets/pages/about-background.jpg
 
 # About Me
 
-<div class="d-flex justify-content-center">
-  <img src="assets/pages/avatar.jpeg" width="200" alt="Profile Picture">
-</div>
-
-I am a software developer with 8+ years experience, writing a variety of software applications and systems including web applications, automation platforms and distributed systems.
+I am a software developer with 9+ years experience, writing a variety of software applications and systems including web applications, automation platforms and distributed systems.
 
 To contact me use one of the links in the footer.
 
