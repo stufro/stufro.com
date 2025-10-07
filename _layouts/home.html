@@ -30,7 +30,7 @@ layout: default
         {{ content }}
 
         <!-- Home Post List -->
-        {% for post in site.posts limit : 5 %}
+        {% for post in site.posts limit : 15 %}
 
         <div class="d-flex align-items-center justify-content-center flex-wrap flex-md-nowrap">
           <a href="{{ post.url | prepend: site.url }}">
@@ -45,12 +45,12 @@ layout: default
               <h3 class="post-subtitle">{{ post.excerpt | strip_html | truncatewords: 15 }}</h3>
               {% endif %}
             </a>
-            <p class="post-meta mb-0">Posted by
-              {% if post.author %}
-              {{ post.author }}
-              {% else %}
-              {{ site.author }}
-              {% endif %}
+            <p class="post-meta mb-0">Posted
+              <!-- {% if post.author %} -->
+              <!-- {{ post.author }} -->
+              <!-- {% else %} -->
+              <!-- {{ site.author }} -->
+              <!-- {% endif %} -->
               on
               {{ post.date | date: '%B %d, %Y' }} &middot; {% include read_time.html content=post.content %}
               &middot; <a style="color: #6c757d" href="{{ post.url | prepend: site.url }}#disqus_thread"></a>
