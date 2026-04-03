@@ -11,6 +11,7 @@ I am a software developer with 9+ years experience, writing a variety of softwar
 To contact me use one of the links in the footer.
 
 ## Technical Skills
+_Last updated August 2024_
 - Programming – Ruby, Crystal, Go, Javascript & Typescript
 - Agile software development – using Kanban, delivering iteratively with close customer interaction.
 - Software design – developing maintainable code, passionate about best practices and design patterns.
@@ -19,6 +20,5 @@ To contact me use one of the links in the footer.
 - TDD and BDD – Experience with RSpec, Cucumber, Capybara, Cypress, Mocha & Jest.
 - Databases – PostgreSQL & MariaDB, experience with NoSQL technologies such as ElasticSearch & MongoDB.
 - DevOps – provisioning infrastructure with Ansible, resolving live issues and scaling applications.
-- AI/LLMs – developed a PoC experimenting using LLMs (mistral + llama2) to interact with operational documentation.
 - Other skills – Elm, Node.js, Linux, Bash, CI/CD (Jenkins & GitLab), Docker, Git, Vim, Kafka, Nginx & Grafana.
 
