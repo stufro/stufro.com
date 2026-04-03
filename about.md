@@ -1,7 +1,7 @@
 ---
 title: about
 layout: page
-background: /assets/pages/about-background.jpg
+background: /assets/pages/about-background.webp
 ---
 
 # About Me

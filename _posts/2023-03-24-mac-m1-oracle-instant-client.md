@@ -5,7 +5,7 @@ subtitle: A guide to navigating using Oracle Instant Client & Ruby on M1 arm64 a
 author: Stuart Frost
 comments: true
 date: 2023-03-24
-background: /assets/dark-mac.jpg
+background: /assets/dark-mac.webp
 tags:
   - tutorial
   - m1

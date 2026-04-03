@@ -4,7 +4,7 @@ title: Remember to KISS (Keep it Simple, Stupid!)
 author: Stuart Frost
 comments: true
 date: 2025-09-25
-background: /assets/lightbulb.jpg
+background: /assets/lightbulb.webp
 image_attribution: Photo by <a href="https://unsplash.com/@theocrazzolara?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Theo Crazzolara</a> on <a href="https://unsplash.com/photos/a-light-bulb-with-a-flame-xDyv5ZItvkY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
 tags:
   - best-practices

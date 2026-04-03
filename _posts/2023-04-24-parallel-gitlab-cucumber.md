@@ -5,7 +5,7 @@ subtitle: How we took our build time from 1 hour to 25 minutes in an afternoon
 author: Stuart Frost
 comments: true
 date: 2023-04-24
-background: /assets/post-content/cucumber.jpg
+background: /assets/post-content/cucumber.webp
 tags:
   - cucumber
   - gitlab
@@ -47,7 +47,7 @@ Each block will become a job and there's a `concurrent` config option in the Git
 which can run at once.
 
 <figure>
-  <img src="/assets/post-content/gitlab-jobs.png" width="200" alt="GitLab Jobs">
+  <img src="/assets/post-content/gitlab-jobs.webp" width="200" alt="GitLab Jobs">
   <small><figcaption>Jobs configured in `gitlab-ci.yml` shown on the GitLab UI</figcaption></small>
 </figure>
 
@@ -118,7 +118,7 @@ Now all that's left to do is distribute the features between a number of arrays 
 To do this we wrote a small recursive method to place the feature files sequentially into each array. This works through the ordered features and places each one into subsequent groups.
 
 <figure style="text-align: center">
-  <img style="width: 100%" src="/assets/post-content/cucumber-recursive-method.png" alt="Diagram demonstrating how recursive method works">
+  <img style="width: 100%" src="/assets/post-content/cucumber-recursive-method.webp" alt="Diagram demonstrating how recursive method works">
   <small><figcaption>Visual representation of how the recursive method works</figcaption></small>
 </figure>
 
@@ -193,6 +193,6 @@ end
 All in all it was well worth the effort spent, over halving our pipeline run time. There's still work to do but having our pipelines like the one below finish within around 25 minutes has been a breath of fresh air for the whole development team.
 
 <figure style="text-align: center">
-  <img src="/assets/post-content/concurrent-cucumber-result.png" style="width: 100%" alt="GitLab Jobs">
+  <img src="/assets/post-content/concurrent-cucumber-result.webp" style="width: 100%" alt="GitLab Jobs">
   <small><figcaption>Screenshot of recent GitLab pipeline</figcaption></small>
 </figure>

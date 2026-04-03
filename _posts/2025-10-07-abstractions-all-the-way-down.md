@@ -4,7 +4,7 @@ title: Abstractions All the Way Down
 subtitle: The hidden complexity beneath every line of code
 author: Stuart Frost
 comments: true
-background: /assets/post-content/layers.jpg
+background: /assets/post-content/layers.webp
 image_attribution: Photo by <a href="https://unsplash.com/@martinsanchez?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Martin Sanchez</a> on <a href="https://unsplash.com/photos/a-black-and-white-photo-of-a-tunnel-NfLZeAN7I6s?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
 date: 2025-10-07
 tags:

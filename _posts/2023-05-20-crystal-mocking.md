@@ -5,7 +5,7 @@ subtitle: Specifically using `inject_mock` method
 author: Stuart Frost
 comments: true
 date: 2023-05-20
-background: /assets/post-content/crystal.jpg
+background: /assets/post-content/crystal.webp
 tags:
   - testing
   - crystal

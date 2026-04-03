@@ -5,7 +5,7 @@ subtitle: How to use the Grover gem to generate a .zip file of multiple PDFs
 author: Stuart Frost
 comments: true
 date: 2023-03-26
-background: /assets/rails-b&w.jpg
+background: /assets/rails-b&w.webp
 tags:
   - tutorial
   - rails
