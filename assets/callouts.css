@@ -1,0 +1,83 @@
+figcaption {
+  color: #6c757d;
+}
+
+/* Bootstrap-style callout panels */
+.callout {
+  border: 1px solid;
+  border-radius: 1rem;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.callout-title {
+  font-weight: 600;
+  font-size: 1.4rem;
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+.callout-body {
+  background-color: #fff;
+  padding: 0.75rem 1rem;
+  color: #212529;
+}
+
+.callout-body p:first-child {
+  margin-top: 0;
+}
+
+.callout-body p:last-child {
+  margin-bottom: 0;
+}
+
+.callout-icon {
+  color: inherit;
+}
+
+/* Note / Info — blue */
+.callout-note,
+.callout-info {
+  border-color: #b8d4f5;
+}
+.callout-note .callout-title,
+.callout-info .callout-title {
+  background-color: #ddeeff;
+  color: #1a4f8a;
+}
+
+/* Tip — green */
+.callout-tip {
+  border-color: #aedcbe;
+}
+.callout-tip .callout-title {
+  background-color: #d4edda;
+  color: #1a5c35;
+}
+
+/* Important — purple */
+.callout-important {
+  border-color: #c9b8e8;
+}
+.callout-important .callout-title {
+  background-color: #e8e0f5;
+  color: #4a2a8a;
+}
+
+/* Warning — yellow */
+.callout-warning {
+  border-color: #ffe08a;
+}
+.callout-warning .callout-title {
+  background-color: #fff3cd;
+  color: #7a5800;
+}
+
+/* Caution — red */
+.callout-caution {
+  border-color: #f5b8be;
+}
+.callout-caution .callout-title {
+  background-color: #fde0e3;
+  color: #8a1a24;
+}

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://www.stufro.com/2023/03/26/generating-pdfs-in-rails.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Generating PDFs in Rails">
+  
+    <meta property="og:description" content="How to use the Grover gem to generate a .zip file of multiple PDFs">
+  
+  <meta property="og:image" content="https://www.stufro.com/assets/rails-b&w.webp">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="www.stufro.com">
+  <meta property="twitter:url" content="https://www.stufro.com/2023/03/26/generating-pdfs-in-rails.html">
+  <meta name="twitter:title" content="Generating PDFs in Rails">
+  <meta name="twitter:site" content="@StuFro_">
+  <meta name="twitter:creator" content="@StuFro_">
+  
+    <meta name="twitter:description" content="How to use the Grover gem to generate a .zip file of multiple PDFs">
+  
+  <meta name="twitter:image" content="https://www.stufro.com/assets/rails-b&w.webp">
+
+  <title>
+    Generating PDFs in Rails - stufro
+    
+  </title>
+
+  <meta name="description" content="Whilst working on v0.3.0 of Chordly, I needed to implement a feature where users could generate and download multiple PDFs at once. To do this I used the Gro...">
+
+  <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js" crossorigin="anonymous"></script>
+
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3401313551409918" crossorigin="anonymous"></script> -->
+
+  <link rel="stylesheet" href='/assets/main.css'>
+  <link rel="stylesheet" href="/assets/syntax.css">
+  <link rel="stylesheet" href="/assets/callouts.css">
+  <link rel="stylesheet" href="/assets/overrides.css">
+  <link rel="canonical" href="https://www.stufro.com/2023/03/26/generating-pdfs-in-rails.html">
+  <link rel="alternate" type="application/rss+xml" title="stufro" href='/%20/feed.xml'>
+
+</head>
+
+
+<body>
+
+  <!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand" href="/">stufro</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      Menu
+      <i class="fa fa-bars"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/projects">Projects</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <!-- Page Header -->
+
+<header class="masthead" style="background-image: url('https://www.stufro.com/assets/rails-b&w.webp')">
+  
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>Generating PDFs in Rails</h1>
+            
+            <h2 class="subheading">How to use the Grover gem to generate a .zip file of multiple PDFs</h2>
+            
+            <span class="meta">Posted by
+              <a href="#">Stuart Frost</a>
+              on March 26, 2023 &middot; <span class="reading-time" title="Estimated read time">
+  
+   4 mins  read </span>
+              &middot; <a style="color: white" href="https://www.stufro.com/2023/03/26/generating-pdfs-in-rails.html#disqus_thread"></a>
+            </span>
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+
+        <p>Whilst working on v0.3.0 of <a href="https://www.chordly.co.uk">Chordly</a>, I needed to implement a feature where users
+could generate and download multiple PDFs at once. To do this I used the <a href="https://github.com/Studiosity/grover">Grover</a>
+gem and <a href="https://www.rubydoc.info/github/rubyzip/rubyzip/Zip/OutputStream"><code class="language-plaintext highlighter-rouge">Zip::OutputStream</code></a> from the Ruby standard
+library.</p>
+
+<p>In this tutorial I’ll take you through the solution I ended up with.</p>
+
+<h1 id="grover-basics">Grover Basics</h1>
+
+<p>Grover is a fantastic gem, one that I was thrilled to find when I started working on <a href="https://www.chordly.co.uk">Chordly</a>.
+It uses <a href="https://pptr.dev/">Google Puppeteer</a> to render a web page in a headless browser and then converts the content into
+other formats such as PDF or PNG.</p>
+
+<p>A quick glance at Grover’s README will show you how simple it is to get started; initialize an instance of <code class="language-plaintext highlighter-rouge">Grover</code> with a URL
+or inline HTML, call <code class="language-plaintext highlighter-rouge">to_pdf</code> on it and away you go.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Grover.new accepts a URL or inline HTML and optional parameters for Puppeteer</span>
+<span class="n">grover</span> <span class="o">=</span> <span class="no">Grover</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'https://google.com'</span><span class="p">,</span> <span class="ss">format: </span><span class="s1">'A4'</span><span class="p">)</span>
+<span class="n">pdf</span> <span class="o">=</span> <span class="n">grover</span><span class="p">.</span><span class="nf">to_pdf</span>
+</code></pre></div></div>
+
+<p>Taking that one step further towards a more realistic use case and we render one of our Rails views as a string to pass into the gem.
+This is exactly how I had been using Grover up until now in the <code class="language-plaintext highlighter-rouge">show</code> action of my <a href="https://github.com/stufro/chordly/blob/d85f61ad58f75cb9842fbad21427f8fb54daeae1/app/controllers/chord_sheets_controller.rb#L14-L17">controller</a>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">html</span> <span class="o">=</span> <span class="no">MyController</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">render_to_string</span><span class="p">({</span>
+  <span class="ss">template: </span><span class="s1">'controller/view'</span><span class="p">,</span>
+  <span class="ss">layout: </span><span class="s1">'my_layout'</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">pdf</span> <span class="o">=</span> <span class="no">Grover</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="o">**</span><span class="n">grover_options</span><span class="p">).</span><span class="nf">to_pdf</span>
+</code></pre></div></div>
+
+<h1 id="zipping-it-up">Zipping it up</h1>
+<p>My use case was that I had a <code class="language-plaintext highlighter-rouge">SetList</code> model which has many <code class="language-plaintext highlighter-rouge">ChordSheet</code>’s. I needed to give the user the option to
+download their set list as a ZIP file containing separate PDFs.</p>
+
+<p>In my naivity I had assumed this would involve generating each PDF and saving it to disk in turn, creating a .zip file from these PDFs
+before serving that file up to the user and doing some inevitable cleanup. So you can imagine my joy when I discovered <code class="language-plaintext highlighter-rouge">Zip::OutputStream</code>.</p>
+
+<p>A built-in Ruby library which allows you to generate .zip files on the fly, you call <code class="language-plaintext highlighter-rouge">write_buffer</code> passing it a block which then allows you
+to write multiple files to the ZIP file stream.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"zip"</span>
+
+<span class="no">Zip</span><span class="o">::</span><span class="no">OutputStream</span><span class="p">.</span><span class="nf">write_buffer</span> <span class="k">do</span> <span class="o">|</span><span class="n">zio</span><span class="o">|</span>
+  <span class="n">zio</span><span class="p">.</span><span class="nf">put_next_entry</span><span class="p">(</span><span class="s2">"file_name.pdf"</span><span class="p">)</span>
+  <span class="n">zio</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="ss">:placeholder_for_pdf_file_content</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>So all I had to do was loop through the chord sheets in my set list, call <code class="language-plaintext highlighter-rouge">put_next_entry</code> with the chord sheet name, write the PDF content
+using <code class="language-plaintext highlighter-rouge">Grover.new(...).to_pdf</code> as I did above and I was off to the races!</p>
+
+<p>Here’s how that looked in practice, you can see the full code <a href="https://github.com/stufro/chordly/blob/3f3ab548e5e6dbbdf522d04b14bc44275749f26f/app/models/set_list_exporter.rb">here</a>.
+The only additional thing below is that I return <code class="language-plaintext highlighter-rouge">io.string</code> from the method. This allowed me to pass the entire ZIP contents
+back up to the controller where it was served to the user using <code class="language-plaintext highlighter-rouge">send_data</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">to_zip</span>
+  <span class="n">io</span> <span class="o">=</span> <span class="no">Zip</span><span class="o">::</span><span class="no">OutputStream</span><span class="p">.</span><span class="nf">write_buffer</span> <span class="k">do</span> <span class="o">|</span><span class="n">zio</span><span class="o">|</span>
+    <span class="vi">@set_list</span><span class="p">.</span><span class="nf">chord_sheets</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">chord_sheet</span><span class="o">|</span>
+      <span class="n">zio</span><span class="p">.</span><span class="nf">put_next_entry</span><span class="p">(</span><span class="n">file_name</span><span class="p">(</span><span class="n">chord_sheet</span><span class="p">))</span>
+      <span class="n">zio</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">generate_pdf</span><span class="p">(</span><span class="n">chord_sheet</span><span class="p">))</span>
+    <span class="k">end</span>
+    <span class="n">zio</span>
+  <span class="k">end</span>
+
+  <span class="n">io</span><span class="p">.</span><span class="nf">string</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h1 id="how-do-you-test-it">How do you test it?</h1>
+<p>As is often the case, working out how best to test something is harder than implementing the solution itself.</p>
+
+<p>Before starting I had written a browser level test using <a href="https://www.cypress.io/">Cypress</a> which looked like this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">cy</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="dl">"</span><span class="s2">Separate PDFs</span><span class="dl">"</span><span class="p">).</span><span class="nx">click</span><span class="p">({</span> <span class="na">force</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
+
+<span class="nx">cy</span><span class="p">.</span><span class="nx">wait</span><span class="p">(</span><span class="dl">'</span><span class="s1">@file</span><span class="dl">'</span><span class="p">).</span><span class="nx">its</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">((</span><span class="nx">req</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">cy</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(({</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">expect</span><span class="p">(</span><span class="nx">headers</span><span class="p">[</span><span class="dl">"</span><span class="s2">content-type</span><span class="dl">"</span><span class="p">]).</span><span class="nx">to</span><span class="p">.</span><span class="nx">eq</span><span class="p">(</span><span class="dl">"</span><span class="s2">application/zip</span><span class="dl">"</span><span class="p">)</span>
+      <span class="nx">expect</span><span class="p">(</span><span class="nx">headers</span><span class="p">[</span><span class="dl">"</span><span class="s2">content-disposition</span><span class="dl">"</span><span class="p">]).</span><span class="nx">to</span><span class="p">.</span><span class="nx">include</span><span class="p">(</span><span class="dl">'</span><span class="s1">filename="My amazing set.zip"</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>This gave me a good integration test to check that a .zip file was served up to the user, with the correct file name.</p>
+
+<p>I also wrote some unit tests around the class which generates the ZIP content. These simply check that the ZIP output stream
+receives the correct method calls with the right parameters</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:grover</span><span class="p">)</span> <span class="p">{</span> <span class="n">instance_double</span> <span class="no">Grover</span><span class="p">,</span> <span class="ss">:grover</span><span class="p">,</span> <span class="ss">to_pdf: :some_pdf</span> <span class="p">}</span>
+
+<span class="n">before</span> <span class="k">do</span>
+  <span class="n">allow</span><span class="p">(</span><span class="no">Grover</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">).</span><span class="nf">and_return</span> <span class="n">grover</span>
+  <span class="n">allow</span><span class="p">(</span><span class="no">Zip</span><span class="o">::</span><span class="no">OutputStream</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:write_buffer</span><span class="p">).</span><span class="nf">and_yield</span> <span class="n">zip_io</span>
+<span class="k">end</span>
+
+<span class="n">it</span> <span class="s2">"generates a zip file of all the chord sheet PDFs"</span> <span class="k">do</span>
+  <span class="n">subject</span><span class="p">.</span><span class="nf">export</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">zip_io</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_received</span><span class="p">(</span><span class="ss">:put_next_entry</span><span class="p">).</span><span class="nf">with</span><span class="p">(</span><span class="s2">"1 - Foo.pdf"</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">it</span> <span class="s2">"writes each pdf content"</span> <span class="k">do</span>
+  <span class="n">subject</span><span class="p">.</span><span class="nf">export</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">zip_io</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_received</span><span class="p">(</span><span class="ss">:write</span><span class="p">).</span><span class="nf">with</span><span class="p">(</span><span class="ss">:some_pdf</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>That gave me enough confidence in my feature going forwards. In hindsight, the tests are lacking in confirming the content of the PDF files.
+My code could render a ZIP file full of blank PDFs and my test suite would give me the green light.</p>
+
+<p>To remedy this we could update the the Cypress test to check the contents of each PDF (by taking a digest of the file contents to compare in our test),
+or write some view tests to check the HTML template renders everything we’re expecting. Or perhaps both!</p>
+
+<h1 id="conclusion">Conclusion</h1>
+<p>I love it when you have a problem and you find libraries as good as Grover &amp; Puppeteer which help you solve it in such as easy and elegant way.</p>
+
+
+        <hr>
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+              /**
+              *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+              *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+              */
+              var disqus_config = function () {
+                  this.page.url = "https://www.stufro.com/2023/03/26/generating-pdfs-in-rails.html";  // Replace PAGE_URL with your page's canonical URL variable
+                  this.page.identifier = "/2023/03/26/generating-pdfs-in-rails"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+              };
+              (function() {  // DON'T EDIT BELOW THIS LINE
+                  var d = document, s = d.createElement('script');
+
+                  s.src = 'https://stufro.disqus.com/embed.js';
+
+                  s.setAttribute('data-timestamp', +new Date());
+                  (d.head || d.body).appendChild(s);
+              })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+
+        <div class="clearfix">
+
+          
+          <a class="btn btn-primary float-left"
+            href="https://www.stufro.com/2023/03/24/mac-m1-oracle-instant-client.html" data-toggle="tooltip"
+            data-placement="top" title="Ruby, OCI8 & an M1 Mac">&larr; Previous<span class="d-none d-md-inline">
+              Post</span></a>
+          
+          
+          <a class="btn btn-primary float-right" href="https://www.stufro.com/2023/04/24/parallel-gitlab-cucumber.html"
+            data-toggle="tooltip" data-placement="top" title="Parallelizing Cucumber tests on GitLab runners">Next<span
+              class="d-none d-md-inline">
+              Post</span> &rarr;</a>
+          
+
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Footer -->
+
+<hr>
+
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <ul class="list-inline text-center">
+          
+          <li class="list-inline-item">
+            <a href="mailto:stuart.frosty@gmail.com">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="far fa-envelope fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+          
+          <li class="list-inline-item">
+            <a href="https://x.com/StuFro_">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fab fa-x-twitter fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+          
+          
+          <li class="list-inline-item">
+            <a href="https://www.linkedin.com/in/stuart-frost-2398b9108">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+          
+          <li class="list-inline-item">
+            <a href="https://github.com/stufro">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+          
+        </ul>
+        <p class="copyright text-muted">Copyright &copy;  2026</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/startbootstrap-clean-blog/js/scripts.js"></script>
+
+<script src="/assets/scripts.js"></script>
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '');
+</script>
+
+
+
+  <script id="dsq-count-scr" src="//stufro.disqus.com/count.js" async></script>
+</body>
+
+</html>

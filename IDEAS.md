@@ -1,0 +1,5 @@
+- [ ] Jekyll plugin to copy code snippets
+- [x] Parallel cucumber on gitlab
+- [x] using Grover to generate .zip file of PDFs
+- [ ] Show tags on each post
+- [x] Comments
