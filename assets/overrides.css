@@ -12,6 +12,10 @@ th {
   background-color: #f8f9fa;
 }
 
+a {
+  word-break: break-all;
+}
+
 figcaption {
   color: #6c757d;
 }
