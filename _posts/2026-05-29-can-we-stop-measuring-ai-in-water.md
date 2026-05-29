@@ -56,7 +56,7 @@ When calculating water consumption of data centres, both primary and secondary c
     <figcaption>
       <b>Sources</b>
       <p style="margin: 0">Coal and natural gas: <a href="https://www.eia.gov/todayinenergy/detail.php?id=56820">https://www.eia.gov/todayinenergy/detail.php?id=56820</a></p>
-      <p style="margin: 0">Data centres: <a href="https://watercalculator.org/footprint/data-centers-water-use/">https://watercalculator.org/footprint/data-centers-water-use/</a></p>
+      <p style="margin: 0">Data centres: <a href="https://watercalculator.org/footprint/data-centers-water-use/">https://watercalculator.org/footprint/data-centers-water-use</a></p>
       <p style="margin: 0">Wind: <a href="https://www.gem.wiki/Water_consumption_from_coal_plants">https://www.gem.wiki/Water_consumption_from_coal_plants</a></p>
       <p style="margin: 0">Solar PV: <a href="https://www.pbssocal.org/redefine/fact-check-how-much-water-does-solar-power-really-use">https://www.pbssocal.org/redefine/fact-check-how-much-water-does-solar-power-really-use</a></p>
     </figcaption>
@@ -68,15 +68,18 @@ I think the main sticking point for me regarding the argument which states AI sp
 
 If we go along with the argument that AI is destroying the environment, do we apply the same scrutiny to all our activities online? Or are we perhaps treating AI differently because of other threats we feel it presents?
 
+Adding a few other common online activities to our AI energy usage from the table earlier, you can see how costly something like watching an hour of Netflix is. Of course, the 6.7k joules is just for one AI message, a heavy user will easily outstrip the usage of watching an episode on Netflix. But where are the anti-Netflix posts citing how much water is consumed in cooling data centres powering the streaming giant?
+
 <figure style="text-align: center">
   <img style="width: 100%" src="/assets/post-content/energy-usage-by-activity.webp" alt="Diagram showing propotional energy usage of different online activities, with AI being a small proportion of it">
   <small>
     <figcaption>
       <b>Sources</b>
-      <p style="margin: 0">Netflix: <a href="https://www.carbonbrief.org/factcheck-what-is-the-carbon-footprint-of-streaming-video-on-netflix/">https://www.carbonbrief.org/factcheck-what-is-the-carbon-footprint-of-streaming-video-on-netflix/</a></p>
-      <p style="margin: 0">Zoom: <a href="https://davidmytton.blog/zoom-video-conferencing-energy-and-emissions/">https://davidmytton.blog/zoom-video-conferencing-energy-and-emissions/</a></p>
-      <p style="margin: 0">AI text/image generation: <a href="https://www.technologyreview.com/2025/05/20/1116327/ai-energy-usage-climate-footprint-big-tech/">https://www.technologyreview.com/2025/05/20/1116327/ai-energy-usage-climate-footprint-big-tech/</a></p>
+      <p style="margin: 0">Netflix: <a href="https://www.carbonbrief.org/factcheck-what-is-the-carbon-footprint-of-streaming-video-on-netflix/">https://www.carbonbrief.org/factcheck-what-is-the-carbon-footprint-of-streaming-video-on-netflix</a></p>
+      <p style="margin: 0">Zoom: <a href="https://davidmytton.blog/zoom-video-conferencing-energy-and-emissions/">https://davidmytton.blog/zoom-video-conferencing-energy-and-emissions</a></p>
+      <p style="margin: 0">AI text/image generation: <a href="https://www.technologyreview.com/2025/05/20/1116327/ai-energy-usage-climate-footprint-big-tech/">https://www.technologyreview.com/2025/05/20/1116327/ai-energy-usage-climate-footprint-big-tech</a></p>
       <p style="margin: 0">Google search: <a href="https://store.chipkin.com/articles/did-you-know-it-takes-00003-kwh-per-google-search-and-more">https://store.chipkin.com/articles/did-you-know-it-takes-00003-kwh-per-google-search-and-more</a></p>
+      <p style="margin: 0">Conversion factor: 1 kWh = 3,600,000 joules <a href="https://www.inchcalculator.com/convert/kilowatt-hour-to-joule/">(https://www.inchcalculator.com/convert/kilowatt-hour-to-joule)</a></p>
     </figcaption>
   </small>
 </figure>
