@@ -12,7 +12,7 @@ th {
   background-color: #f8f9fa;
 }
 
-a {
+figcaption a, .footnotes a {
   word-break: break-all;
 }
 
