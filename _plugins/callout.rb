@@ -41,7 +41,7 @@ def transform_callouts(content)
     # and a block div with markdown="1" for the body.
     "<div class=\"callout callout-#{type}\">" \
     "<p class=\"callout-title\"><span class=\"callout-icon\">#{icon}</span> #{title}</p>" \
-    "<div class=\"callout-body\" markdown=\"1\">\n\n" \
+    "<div class=\"callout-body\" markdown=\"block\">\n\n" \
     "#{body_lines}\n\n" \
     "</div></div>\n"
   end

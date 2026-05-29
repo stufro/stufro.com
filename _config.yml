@@ -7,9 +7,6 @@ github_username: stufro
 twitter_username: StuFro_
 linkedin_username: stuart-frost-2398b9108
 
-kramdown:
-  input: GFM
-  parse_block_html: true
 
 plugins:
   - jekyll-remote-theme

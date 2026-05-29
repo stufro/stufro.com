@@ -1,0 +1,21 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+}
+
+th {
+  background-color: #f8f9fa;
+}
+
+figcaption {
+  color: #6c757d;
+}
+
+/* Footnote references rendered as [1] instead of superscript 1 */
+a.footnote::before { content: "["; }
+a.footnote::after  { content: "]"; }
